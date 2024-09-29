@@ -18,7 +18,9 @@ services:
       - docker-certs-client:/certs/client:ro
       - /usr/bin/docker:/usr/bin/docker
     networks:
-      - project2-compose_jenkins  # Ensure Jenkins is on the same network
+      - jenkins  # Ensure Jenkins is on the same network
+    depends_on:
+     - dind
 
   dind:
     image: docker:dind
@@ -31,7 +33,7 @@ services:
       - docker-certs-client:/certs/client
       - jenkins-data:/var/jenkins_home
     networks:
-      - project2-compose_jenkins  # Connect DinD to the same network
+      - jenkins  # Connect DinD to the same network
 
 volumes:
   jenkins-data:
@@ -39,4 +41,5 @@ volumes:
   docker-certs-client:
 
 networks:
-  project2-compose_jenkins:  # Define the custom network
+  jenkins:  # Define the custom network
+   driver: bridge
