@@ -1,44 +1,42 @@
 version: '3'  # Docker Compose version
 
 services:
-  # Jenkins service definition
   jenkins:
-    image: jenkins/jenkins:lts-jdk11  # Use the official Jenkins image with JDK 11
-    container_name: jenkins  # Container will be named 'jenkins'
-    user: root  # Run the container as root
-    privileged: true  # Allow Jenkins to run privileged operations
+    image: jenkins/jenkins:lts-jdk11
+    container_name: jenkins
+    user: root
+    privileged: true
     environment:
-      DOCKER_HOST: "tcp://dind:2376"  # Connect to Docker via DinD
-      DOCKER_CERT_PATH: "/certs/client"  # Path to Docker TLS certificates
-      DOCKER_TLS_VERIFY: 1  # Enable TLS verification
+      DOCKER_HOST: "tcp://dind:2376"
+      DOCKER_CERT_PATH: "/certs/client"
+      DOCKER_TLS_VERIFY: 1
     ports:
-      - "8081:8080"  # Change to expose Jenkins web interface on port 8081
-      - "50000:50000"  # Expose Jenkins agent port on 50000
+      - "8081:8080"
+      - "50000:50000"
     volumes:
-      - jenkins-data:/var/jenkins_home  # Volume to persist Jenkins data
-      - docker-certs-client:/certs/client:ro  # Read-only volume for Docker TLS certs
-      - /usr/bin/docker:/usr/bin/docker  # Mount Docker CLI for Jenkins to use Docker
+      - jenkins-data:/var/jenkins_home
+      - docker-certs-client:/certs/client:ro
+      - /usr/bin/docker:/usr/bin/docker
     networks:
-      - jenkins  # Connect Jenkins to the custom 'jenkins' network
+      - project2-compose_jenkins  # Ensure Jenkins is on the same network
 
-  # Docker-in-Docker (DinD) service definition
   dind:
-    image: docker:dind  # Use the Docker-in-Docker image
-    container_name: dind  # Container will be named 'dind'
-    privileged: true  # Run the container in privileged mode to enable Docker
+    image: docker:dind
+    container_name: dind
+    privileged: true
     environment:
-      DOCKER_TLS_CERTDIR: "/certs"  # Enable TLS for Docker communication
+      DOCKER_TLS_CERTDIR: "/certs"
     volumes:
-      - docker-certs-ca:/certs/ca  # Volume for CA certificates
-      - docker-certs-client:/certs/client  # Volume for client certificates
-      - jenkins-data:/var/jenkins_home  # Shared volume to persist Docker data for Jenkins
+      - docker-certs-ca:/certs/ca
+      - docker-certs-client:/certs/client
+      - jenkins-data:/var/jenkins_home
     networks:
-      - jenkins  # Connect DinD to the custom 'jenkins' network
+      - project2-compose_jenkins  # Connect DinD to the same network
 
 volumes:
-  jenkins-data:  # Volume to store Jenkins data
-  docker-certs-ca:  # Volume to store Docker CA certificates
-  docker-certs-client:  # Volume to store Docker client certificates
+  jenkins-data:
+  docker-certs-ca:
+  docker-certs-client:
 
 networks:
-  jenkins:  # Define a custom network for communication between services
+  project2-compose_jenkins:  # Define the custom network
