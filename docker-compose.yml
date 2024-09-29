@@ -8,7 +8,7 @@ services:
     user: root  # Run the container as root
     privileged: true  # Allow Jenkins to run privileged operations
     environment:
-      DOCKER_HOST: "tcp://docker:2376"  # Connect to Docker via DinD
+      DOCKER_HOST: "tcp://dind:2376"  # Connect to Docker via DinD
       DOCKER_CERT_PATH: "/certs/client"  # Path to Docker TLS certificates
       DOCKER_TLS_VERIFY: 1  # Enable TLS verification
     ports:
