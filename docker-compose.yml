@@ -15,7 +15,7 @@ services:
       - "50000:50000"
     volumes:
       - jenkins-data:/var/jenkins_home
-      - docker-certs-client:/certs/client:ro
+      - ./docker-certs/server:/certs/client:ro  # Map server certs from host to container
       - /usr/bin/docker:/usr/bin/docker
     networks:
       - jenkins  # Ensure Jenkins is on the same network
@@ -29,8 +29,8 @@ services:
     environment:
       DOCKER_TLS_CERTDIR: "/certs"
     volumes:
-      - docker-certs-ca:/certs/ca
-      - docker-certs-client:/certs/client
+      - ./docker-certs/ca:/certs/ca:ro  # Map CA certs from host to container
+      - ./docker-certs/server:/certs/client:ro  # Map server certs from host to container
       - jenkins-data:/var/jenkins_home
     networks:
       - jenkins  # Connect DinD to the same network
