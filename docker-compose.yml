@@ -1,6 +1,7 @@
-version: '3'  # Docker Compose version
+version: '3'
 
 services:
+  # Jenkins service configuration
   jenkins:
     image: jenkins/jenkins:lts-jdk11
     container_name: jenkins
@@ -11,35 +12,20 @@ services:
       DOCKER_CERT_PATH: "/certs/client"
       DOCKER_TLS_VERIFY: 1
     ports:
-      - "8081:8080"
-      - "50000:50000"
+      - "8081:8080"  # Jenkins Web UI
+      - "50000:50000"  # Jenkins agent communication
     volumes:
       - jenkins-data:/var/jenkins_home
-      - ./docker-certs/client:/certs/client  # Map client certs from host to container
-      - /usr/bin/docker:/usr/bin/docker
+      - docker-certs-client:/certs/client:ro  # Client certs mapped to Jenkins
     networks:
-      - jenkins  # Ensure Jenkins is on the same network
+      - jenkins
     depends_on:
-     - dind
+      - dind
 
+  # Docker-in-Docker (DinD) service configuration
   dind:
     image: docker:dind
     container_name: dind
     privileged: true
     environment:
-      DOCKER_TLS_CERTDIR: "/certs"
-    volumes:
-      - ./docker-certs/ca:/certs/ca  # Map CA certs from host to container
-      - ./docker-certs/client:/certs/client  # Corrected path for client certs
-      - jenkins-data:/var/jenkins_home
-    networks:
-      - jenkins  # Connect DinD to the same network
-
-volumes:
-  jenkins-data:
-  docker-certs-ca:
-  docker-certs-client:
-
-networks:
-  jenkins:  # Define the custom network
-   driver: bridge
+      DOCKER_TLS_CERTDIR: "/
