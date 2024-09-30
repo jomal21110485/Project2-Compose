@@ -1,31 +1,37 @@
-version: '3'
+version: '3.7'  # Docker Compose version
 
 services:
-  # Jenkins service configuration
   jenkins:
     image: jenkins/jenkins:lts-jdk11
     container_name: jenkins
     user: root
     privileged: true
     environment:
-      DOCKER_HOST: "tcp://dind:2376"
-      DOCKER_CERT_PATH: "/certs/client"
-      DOCKER_TLS_VERIFY: 1
+      DOCKER_HOST: "tcp://dind:2375"  # Change from 2376 to 2375 (non-TLS)
     ports:
-      - "8081:8080"  # Jenkins Web UI
-      - "50000:50000"  # Jenkins agent communication
+      - "8081:8080"
+      - "50000:50000"
     volumes:
       - jenkins-data:/var/jenkins_home
-      - docker-certs-client:/certs/client:ro  # Client certs mapped to Jenkins
     networks:
       - jenkins
     depends_on:
       - dind
 
-  # Docker-in-Docker (DinD) service configuration
   dind:
     image: docker:dind
     container_name: dind
     privileged: true
     environment:
-      DOCKER_TLS_CERTDIR: "/
+      DOCKER_TLS_CERTDIR: ""  # Disable TLS
+    volumes:
+      - jenkins-data:/var/jenkins_home
+    networks:
+      - jenkins
+
+volumes:
+  jenkins-data:
+
+networks:
+  jenkins:
+    driver: bridge
